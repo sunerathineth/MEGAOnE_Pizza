@@ -1,0 +1,383 @@
+package mega_one_console_version;
+
+import Components.DataRepository;
+import Components.Feedback;
+import Components.Order;
+import Components.Payment;
+import Components.Pizza;
+import Design_Patterns.PizzaBuilder;
+import Components.Promotion;
+import Components.User;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import Design_Patterns.*;
+import java.util.ArrayList;
+
+import External.*;
+import static External.DeliveryEstimator.calculateDeliveryTime;
+import static External.DeliveryEstimator.getCoordinatesFromPlace;
+import static External.DeliveryEstimator.getUserCountry;
+import java.util.List;
+
+public class MEGA_ONE_Console_Version {
+
+    private Scanner scanner;
+    private static String userInput;
+    private static MEGA_ONE_Console_Version megaOne = new MEGA_ONE_Console_Version();
+
+    // Data center
+    DataRepository repository = new DataRepository();
+
+    public MEGA_ONE_Console_Version() {
+        scanner = new Scanner(System.in);
+    }
+
+    private String getUserInput(String question) {
+        System.out.print(question);
+        userInput = scanner.nextLine();
+        return userInput;
+    }
+
+    private String returnUserInput() {
+        return userInput;
+    }
+
+    private void displayUserInput() {
+        System.out.println(userInput);
+    }
+
+    public void displayMainMenu() {
+        System.out.println("Welcome to the MEGA OnE Pizza Shop");
+        System.out.println("1. Place an custom order");
+        System.out.println("2. View menu");
+        System.out.println("3. View your profile");
+        System.out.println("4. Manage favorites");
+        System.out.println("5. View order history");
+        System.out.println("6. Track order");
+        System.out.println("7. View promotions");
+        System.out.println("8. Provide feedback");
+        System.out.println("9. Exit\n");
+    }
+
+    private void initiateSystem() {
+        megaOne.displayMainMenu();
+    }
+    
+    private static String formatDeliveryTime(double timeInMinutes) {
+        if (timeInMinutes < 60) {
+            return String.format("%.1f minutes", timeInMinutes);
+        } else if (timeInMinutes >= 60 && timeInMinutes < 1440) {
+            double hours = timeInMinutes / 60;
+            return String.format("%.1f hours", hours);
+        } else {
+            double days = timeInMinutes / 1440;
+            return String.format("%.1f days", days);
+        }
+    }
+    
+    public void getDeliveryTime() {
+        String userCountry = getUserCountry();
+        if (userCountry == null) {
+            System.out.println("Couldn't identify your country. Results will be not limited to your country.");
+        }
+
+        System.out.print("Enter the starting place name: ");
+        String startPlace = scanner.nextLine();
+
+        System.out.print("Enter the destination place name: ");
+        String endPlace = scanner.nextLine();
+
+        try {
+            List<String> startCoordinatesList = getCoordinatesFromPlace(startPlace, userCountry);
+            List<String> endCoordinatesList = getCoordinatesFromPlace(endPlace, userCountry);
+
+            if (startCoordinatesList.isEmpty()) {
+                System.out.println("No places found in your country for the starting location.");
+                return;
+            }
+            
+            System.out.println("Select the correct starting place:");
+            for (int i = 0; i < startCoordinatesList.size(); i++) {
+                System.out.println((i + 1) + ". " + startCoordinatesList.get(i));
+            }
+            
+            System.out.print("Enter the number of the correct starting place: ");
+            int startChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (endCoordinatesList.isEmpty()) {
+                System.out.println("No places found in your country for the destination location.");
+                return;
+            }
+            System.out.println("Select the correct destination place:");
+            for (int i = 0; i < endCoordinatesList.size(); i++) {
+                System.out.println((i + 1) + ". " + endCoordinatesList.get(i));
+            }
+            System.out.print("Enter the number of the correct destination place: ");
+            int endChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            String startCoordinates = startCoordinatesList.get(startChoice - 1).split(":")[1].trim();
+            String endCoordinates = endCoordinatesList.get(endChoice - 1).split(":")[1].trim();
+
+            if (startCoordinates == null || endCoordinates == null) {
+                System.out.println("Error retrieving coordinates. Please check the place names.");
+                return;
+            }
+
+            double deliveryTime = calculateDeliveryTime(startCoordinates, endCoordinates);
+
+            if (deliveryTime != -1) {
+                String finalEstimatedDeliveryTime = formatDeliveryTime(deliveryTime);
+                System.out.println("Delivery time: " + finalEstimatedDeliveryTime);
+            } else {
+                System.out.println("Unable to calculate delivery time.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void main(String[] args) {
+        
+        // Testing Area
+        
+        megaOne.getDeliveryTime();
+
+        //megaOne.initiateSystem();
+
+//        megaOne.getUserInput("What is your name: ");
+//        megaOne.returnUserInput();
+
+
+
+
+
+
+
+
+
+
+
+        // Base Pizza
+
+//        Pizza pizza = new Pizza("Custom Pizza", "Base pizza", "Thin Crust", "Medium", new ArrayList<>(), 10.00, 4.0);
+
+
+        // Create handlers
+
+//        CustomizationHandler crustHandler = new CrustHandler();
+//        CustomizationHandler sauceHandler = new SauceHandler();
+//        CustomizationHandler toppingHandler = new ToppingHandler();
+
+
+        // Set up the chain
+
+//        crustHandler.setNextHandler(sauceHandler);
+//        sauceHandler.setNextHandler(toppingHandler);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Process customizations
+
+//        crustHandler.handleRequest(pizza, "Crust:Thick Crust");
+//        crustHandler.handleRequest(pizza, "Sauce:Tomato Basil");
+//        crustHandler.handleRequest(pizza, "Topping:Mushrooms");
+//        crustHandler.handleRequest(pizza, "Topping:Olives");
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Final Pizza Details
+
+//        System.out.println("\nFinal Pizza Details:");
+//        System.out.println("Name: " + pizza.getName());
+//        System.out.println("Description: " + pizza.getDescription());
+//        System.out.println("Crust: " + pizza.getCrustType());
+//        System.out.println("Toppings: " + pizza.getToppings());
+//        System.out.println("Base Price: Rs." + pizza.calculatePrice());
+
+//        Pizza basePizza = new Pizza("Margerita", "Classic pizza with mozzarella", "Thin Crust", "Medium", Arrays.asList("Cheese", "Tomatoes"), 4300.0, 4.5);
+//        
+//        Pizza cheesePizza = new ExtraCheeseDecorator(basePizza);
+//        Pizza pepperoniPizza = new ExtraPepperoniDecorator(cheesePizza);
+//        Pizza packagedPizza = new SpecialPackagingDecorator(pepperoniPizza);
+//        Pizza premiumPizza = new PremiumToppingDecorator(packagedPizza, "Truffle Oil", 100);
+//        
+//        System.out.println("Description: " + premiumPizza.getDescription());
+//        System.out.println("Total Price: Rs. " + premiumPizza.calculatePrice());
+
+
+
+
+
+
+
+
+
+
+
+
+//        PaymentProcessor paymentProcessor = new PaymentProcessor();
+//        
+//        paymentProcessor.setPaymentStrategy(new CreditCardPayment("12345678910", "Sunera Thineth"));
+//        paymentProcessor.processPayment(4000);
+//        
+//        paymentProcessor.setPaymentStrategy(new WalletPayment("wallet123"));
+//        paymentProcessor.processPayment(500.0);
+//
+//        paymentProcessor.setPaymentStrategy(new LoyaltyPointsPayment(800));
+//        paymentProcessor.processPayment(300.0);
+//
+//        paymentProcessor.setPaymentStrategy(new LoyaltyPointsPayment(100));
+//        paymentProcessor.processPayment(300.0);
+
+
+
+
+
+
+
+
+
+        // Observer testing
+
+//        Order order = new Order(1);
+//        
+//        User user_ = new User("Sunera", "suneraedu@gmail.com", "0719427485");
+//        
+//        order.registerObserver(user_);
+//        
+//        order.setStatus("Preparing");
+//        order.setStatus("Out for delivery");
+//        order.setStatus("Delivered");
+
+
+
+
+
+
+
+        // Pizza builder testing
+//        Pizza customPizza = new PizzaBuilder()
+//                .setName("Veggie Delight")
+//                .setDescription("A healthy veggie pizza")
+//                .setCrustType("Whole wheat")
+//                .setsize("Large")
+//                .addTopping("Mushrooms")
+//                .addTopping("Olives")
+//                .addTopping("Spinach")
+//                .setBasePrice(2000)
+//                .setRating(4.7)
+//                .build();
+//        
+//        System.out.println(customPizza);
+
+//        Pizza margaritaPizza = new Pizza("Margerita", "Classic pizza with fresh mozzarella and basil", "Thin crust", "Small", Arrays.asList("Cheese", "Tomatoes"), 4200, 4.5);
+//        Pizza sausagePizza = new Pizza("Sausage", "Classic pizza with fresh mozzarella and sausage", "Thin crust", "Medium", Arrays.asList("Cheese", "Sausage"), 6000, 5);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // User testing
+//        User user1 = new User("Sunera", "suneraedu@gmail.com", "0719427485");
+//        System.out.println(user1);
+//        System.out.println(margaritaPizza);
+//        System.out.println(sausagePizza);
+        // Promotion testing
+//        Promotion holidayPromo = new Promotion("Holiday Special", "Get 20% off on selected pizza", 20.0, true, LocalDate.of(2024, 12, 20), LocalDate.of(2024, 12, 31), Arrays.asList(1));
+//
+//        System.out.println("Is promotion active: " + holidayPromo.isPromotionActive());
+//        
+//        double originalPrice = 1000.0;
+//        double discountedPrice = holidayPromo.applyPromotion(originalPrice);
+//        
+//        System.out.println("Original Price: Rs." + originalPrice);
+//        System.out.println("Discounted Price: Rs." + discountedPrice + "\n");
+//        
+//        System.out.println(holidayPromo);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Payment testing
+//        Payment payment1 = new Payment(1, "Credit Card", 1200);
+//        
+//        System.out.println("Before processing: " + payment1);
+//        
+//        payment1.processPayment();
+//        System.out.println("After processing: " + payment1);
+//        
+//        System.out.println("Was the payment successful: " + payment1.isPaymentSuccessful());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Feedback testing
+//        Feedback feedback1 = new Feedback(123, 1, 2, "This pizza is superb and so cheesy");
+//        
+//        System.out.println(feedback1);
+    }
+
+}
